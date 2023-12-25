@@ -1,0 +1,120 @@
+
+Analysis Questions
+
+--Retrieve all records for a specific city (e.g., Mumbai).
+
+select * from airquality
+where city = 'Mumbai'
+
+--Find The average AQI value for each state.
+
+SELECT
+  state,
+  AVG(currentaqivalue) AS avg_aqi
+FROM
+  airquality
+GROUP BY
+  state;
+
+--Identify cities where AQI is above a certain threshold (e.g.,, AQI>200)?
+
+select city, currentaqivalue
+from airquality
+where currentaqivalue>200;
+
+--count the number of records with insufficent data?
+
+select count(*) as Insufficent_datacount
+from airquality
+where currentaqivalue is null;
+
+--Find the highest AQI value along with the corresponding city and state?
+
+select state,city,currentaqivalue
+from airquality
+order by currentaqivalue desc
+limit 1;
+
+--Calculate the overall average AQI for the entire dataset.
+
+select avg(currentaqivalue) as overall_avg_aqi
+from airquality;
+
+
+--Retrieve records for states with more than five city.
+select State, count(distinct City) 
+from  airquality
+group by State
+Having count(distinct City) >5;
+
+
+--Find the cities in a specific state with AQI less than 50?
+
+select State, City, currentaqivalue
+from airquality
+where currentaqivalue<50
+order by currentaqivalue ;
+
+
+--Categorize AQI values into dofferent pollution levels?
+
+select city, currentaqivalue,
+case
+ when currentaqivalue <= 50 then 'Good'
+ when currentaqivalue <= 100 then 'Moderate'
+ when currentaqivalue <= 150 then 'Unhealthy for sensitive group'
+ when currentaqivalue <= 200 then 'Unhealthy'
+ when currentaqivalue <= 300 then 'Very unhealthy'
+ else 'Hazardous'
+ 
+end as pollution_level
+from airquality
+
+--Find cities with the lowest AQI values in each state and rank them
+
+select state, city,currentaqivalue,
+rank() over (partition by state order by currentaqivalue) as lowest_aqi_rnk
+from airquality
+
+
+--Retrieve the states where the highest pollution level is recorded and the corresponding pollution level.
+
+select state, max(currentaqivalue) as highest_polution
+from airquality
+group by state;
+
+--Identify the stations where the pollution level is higher than the average pollution level across all stations.
+
+SELECT state, currentaqivalue
+FROM airquality
+WHERE currentaqivalue > (SELECT AVG(currentaqivalue) FROM airquality);
+
+
+--Retrieve the names and pollution levels of stations in the National Capital Region (NCR).
+
+SELECT state ,currentaqivalue
+FROM airquality
+WHERE City IN ('Delhi', 'Ghaziabad', 'Noida', 'Gurugram', 'Faridabad');
+
+--Find the monitoring stations in South India (Andhra Pradesh, Karnataka, Kerala, Tamil Nadu, Telangana) with pollution levels greater than 100.
+
+select state, currentaqivalue
+from airquality
+where state in ('Andhra Pradesh','Karnataka','Kerala','Tamil Nadu','Telangana')
+and currentaqivalue > 100;
+
+--Find the states with the highest average pollution levels.
+
+SELECT State, AVG(currentaqivalue) as highest_pollution
+FROM airquality
+GROUP BY State,currentaqivalue
+ORDER BY highest_pollution desc,state
+LIMIT 1;
+
+--Find the states with the lowest average pollution levels.
+
+SELECT State, AVG(currentaqivalue) as lowest_pollution
+FROM airquality
+GROUP BY State,currentaqivalue
+ORDER BY lowest_pollution,state
+LIMIT 1;
